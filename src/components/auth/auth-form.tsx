@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState } from "react";
 import { signIn, signUp, signInWithGoogle, type AuthResult } from "@/lib/auth/actions";
 import { SubmitButton } from "./submit-button";
 import { Input } from "@/components/ui/input";
@@ -36,20 +36,20 @@ export function AuthForm({
   switchHref,
   switchLabel,
 }: AuthFormProps) {
+  const [error, setError] = useState<string | undefined>();
   const action = mode === "login" ? signIn : signUp;
-  const [state, formAction] = useActionState(
-    async (_prevState: AuthResult, formData: FormData) => {
-      return action(formData);
-    },
-    initialState
-  );
 
-  const [googleState, googleFormAction] = useActionState(
-    async (_prevState: AuthResult, formData: FormData) => {
-      return signInWithGoogle(formData);
-    },
-    initialState
-  );
+  async function handleSubmit(formData: FormData) {
+    setError(undefined);
+    const result = await action(formData);
+    if (result?.error) setError(result.error);
+  }
+
+  async function handleGoogleSubmit(formData: FormData) {
+    setError(undefined);
+    const result = await signInWithGoogle(formData);
+    if (result?.error) setError(result.error);
+  }
 
   return (
     <Card className="mx-auto w-full max-w-md">
@@ -59,16 +59,16 @@ export function AuthForm({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Error messages */}
-        {(state.error || googleState.error) && (
+        {error && (
           <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-            {state.error || googleState.error}
+            {error}
           </div>
         )}
 
         {/* Google OAuth */}
         {showGoogle && (
           <>
-            <form action={googleFormAction}>
+            <form action={handleGoogleSubmit}>
               <input type="hidden" name="role" value={role} />
               {nextPath && <input type="hidden" name="next" value={nextPath} />}
               <Button type="submit" variant="outline" className="w-full gap-3">
@@ -106,7 +106,7 @@ export function AuthForm({
         )}
 
         {/* Email + Password form */}
-        <form action={formAction} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
           <input type="hidden" name="role" value={role} />
           {nextPath && <input type="hidden" name="next" value={nextPath} />}
 
