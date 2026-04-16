@@ -23,8 +23,6 @@ interface AuthFormProps {
   switchLabel: string;
 }
 
-const initialState: AuthResult = {};
-
 export function AuthForm({
   mode,
   role,
