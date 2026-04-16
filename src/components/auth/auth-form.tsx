@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn, signUp, signInWithGoogle, type AuthResult } from "@/lib/auth/actions";
+import { signIn, signUp, signInWithGoogle } from "@/lib/auth/actions";
 import { SubmitButton } from "./submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
